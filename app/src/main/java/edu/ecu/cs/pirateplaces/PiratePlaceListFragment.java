@@ -115,25 +115,6 @@ public class PiratePlaceListFragment extends Fragment
         mCallbacks = null;
     }
 
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data)
-//    {
-//        if (requestCode == REQUEST_PIRATE_PLACE) {
-//            if (resultCode == Activity.RESULT_OK && data != null) {
-//                UUID updatedId = PiratePlaceFragment.getUpdatedId(data);
-//                if (updatedId != null) {
-//                    PirateBase pirateBase = PirateBase.getPirateBase(getActivity());
-//                    List<PiratePlace> piratePlaces = pirateBase.getPiratePlaces();
-//                    PiratePlace updatedPlace = pirateBase.getPiratePlace(updatedId);
-//                    int index = piratePlaces.indexOf(updatedPlace);
-//                    if (index >= 0 && mAdapter != null) {
-//                        mAdapter.notifyItemChanged(index);
-//                    }
-//                }
-//            }
-//        }
-//    }
-
     private class PiratePlaceHolder extends RecyclerView.ViewHolder
         implements View.OnClickListener
     {

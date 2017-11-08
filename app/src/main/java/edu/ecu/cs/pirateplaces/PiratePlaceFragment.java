@@ -239,10 +239,6 @@ public class PiratePlaceFragment extends Fragment
             updatePiratePlace();
             updateLastVisitedDate();
         } else if (requestCode == REQUEST_PHOTO) {
-
-//            getActivity().revokeUriPermission(uri,
-//                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-
             updatePiratePlace();
             updateUI();
         }
