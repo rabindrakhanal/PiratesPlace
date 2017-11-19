@@ -3,6 +3,7 @@ package edu.ecu.cs.pirateplaces;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,6 +21,9 @@ import android.widget.Toast;
 
 import java.util.List;
 import java.util.UUID;
+
+import edu.ecu.cs.pirateplaces.databinding.FragmentPiratePlaceListBinding;
+import edu.ecu.cs.pirateplaces.databinding.ListItemPiratePlaceBinding;
 
 /**
  * Main fragment for the Pirate Place list
@@ -59,14 +63,14 @@ public class PiratePlaceListFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.fragment_pirate_place_list, container, false);
+        FragmentPiratePlaceListBinding binding = DataBindingUtil.inflate(inflater,R.layout.fragment_pirate_place_list,container,false);
 
-        mPiratePlaceRecyclerView = (RecyclerView) view.findViewById(R.id.pirate_place_recycler_view);
+        mPiratePlaceRecyclerView = binding.piratePlaceRecyclerView;
         mPiratePlaceRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         updateUI();
 
-        return view;
+        return binding.getRoot();
     }
 
     protected void updateUI() {
@@ -118,16 +122,20 @@ public class PiratePlaceListFragment extends Fragment
     private class PiratePlaceHolder extends RecyclerView.ViewHolder
         implements View.OnClickListener
     {
+        private ListItemPiratePlaceBinding mBinding;
+
         private PiratePlace mPiratePlace;
         private TextView mTitleTextView;
         private TextView mDateTextView;
 
-        public PiratePlaceHolder(LayoutInflater inflater, ViewGroup parent)
+        public PiratePlaceHolder(ListItemPiratePlaceBinding binding)
         {
-            super(inflater.inflate(R.layout.list_item_pirate_place, parent, false));
+            super(binding.getRoot());
 
-            mTitleTextView = (TextView) itemView.findViewById(R.id.pirate_place_name);
-            mDateTextView = (TextView) itemView.findViewById(R.id.pirate_place_last_visited);
+            mBinding = binding;
+            PirateBase pirateBase = PirateBase.getPirateBase(getActivity());
+            PiratePlaceViewModel viewModel = new PiratePlaceViewModel(pirateBase);
+            mBinding.setViewModel(viewModel);
 
             itemView.setOnClickListener(this);
         }
@@ -135,10 +143,9 @@ public class PiratePlaceListFragment extends Fragment
         public void bind(PiratePlace piratePlace)
         {
             mPiratePlace = piratePlace;
-            mTitleTextView.setText(mPiratePlace.getPlaceName());
-            String lastVisitedDate = DateFormat.getDateFormat(getActivity()).format(mPiratePlace.getLastVisited());
-            String lastVisitedTime = DateFormat.getTimeFormat(getActivity()).format(mPiratePlace.getLastVisited());
-            mDateTextView.setText(lastVisitedDate + " " + lastVisitedTime);
+            mBinding.getViewModel().setPiratePlace(mPiratePlace);
+            mBinding.executePendingBindings();
+
         }
 
         @Override
@@ -165,7 +172,8 @@ public class PiratePlaceListFragment extends Fragment
         public PiratePlaceHolder onCreateViewHolder(ViewGroup parent, int viewType)
         {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            return new PiratePlaceHolder(layoutInflater, parent);
+            ListItemPiratePlaceBinding binding = DataBindingUtil.inflate(layoutInflater,R.layout.list_item_pirate_place,parent,false);
+            return new PiratePlaceHolder(binding);
         }
 
         @Override

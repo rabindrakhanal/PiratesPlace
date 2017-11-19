@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -37,6 +38,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import edu.ecu.cs.pirateplaces.databinding.FragmentPiratePlaceBinding;
+import edu.ecu.cs.pirateplaces.databinding.FragmentPiratePlaceImageBinding;
+
 /**
  * Displays an individual Pirate Place so it can be edited
  *
@@ -67,6 +71,8 @@ public class PiratePlaceFragment extends Fragment
     private Callbacks mCallbacks;
     private RecyclerView mRecyclerView;
     private ImageAdapter mAdapter;
+
+    private FragmentPiratePlaceBinding mBinding;
 
 
     /**
@@ -113,37 +119,14 @@ public class PiratePlaceFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
-        View v = inflater.inflate(R.layout.fragment_pirate_place, container, false);
+        mBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_pirate_place,container,false);
 
-        mPlaceNameTextView = (EditText) v.findViewById(R.id.pirate_place_name);
-        mPlaceNameTextView.setText(mPiratePlace.getPlaceName());
-        mPlaceNameTextView.addTextChangedListener(new TextWatcher()
-        {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after)
-            {
 
-            }
+        mPlaceNameTextView = mBinding.piratePlaceName;
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count)
-            {
-                mPiratePlace.setPlaceName(s.toString());
-                updatePiratePlace();
-            }
+        mLastVisitedTextView = mBinding.piratePlaceLastVisited;
 
-            @Override
-            public void afterTextChanged(Editable s)
-            {
-
-            }
-        });
-
-        mLastVisitedTextView = (EditText) v.findViewById(R.id.pirate_place_last_visited);
-        mLastVisitedTextView.setKeyListener(null);
-        updateLastVisitedDate();
-
-        mResetDateButton = (Button) v.findViewById(R.id.check_in_button);
+        mResetDateButton = mBinding.checkInButton;
         mResetDateButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -155,8 +138,8 @@ public class PiratePlaceFragment extends Fragment
             }
         });
 
-        mDateButton = (Button) v.findViewById(R.id.edit_date);
-        mTimeButton = (Button) v.findViewById(R.id.edit_time);
+        mDateButton = mBinding.editDate;
+        mTimeButton = mBinding.editTime;
 
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,7 +165,7 @@ public class PiratePlaceFragment extends Fragment
             }
         });
 
-        mSendToFriendButton = (Button) v.findViewById(R.id.send_to_friend);
+        mSendToFriendButton = mBinding.sendToFriend;
         mSendToFriendButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -199,12 +182,13 @@ public class PiratePlaceFragment extends Fragment
             }
         });
 
-        mRecyclerView = (RecyclerView) v.findViewById(R.id.pirate_place_images_recycler_view);
+        mRecyclerView = mBinding.piratePlaceImagesRecyclerView;
         mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
 
+        bindingUI();
         updateUI();
 
-        return v;
+        return mBinding.getRoot();
     }
 
     protected void updateUI() {
@@ -299,9 +283,16 @@ public class PiratePlaceFragment extends Fragment
 
     private void updateLastVisitedDate()
     {
-        String lastVisitedDate = DateFormat.getDateFormat(getActivity()).format(mPiratePlace.getLastVisited());
-        String lastVisitedTime = DateFormat.getTimeFormat(getActivity()).format(mPiratePlace.getLastVisited());
-        mLastVisitedTextView.setText(lastVisitedDate + " " + lastVisitedTime);
+        bindingUI();
+    }
+
+    private void bindingUI(){
+        PirateBase base = PirateBase.getPirateBase(getActivity());
+        PiratePlaceViewModel viewModel = new PiratePlaceViewModel(base);
+        mBinding.setViewModel(viewModel);
+
+        mBinding.getViewModel().setPiratePlace(mPiratePlace);
+        mBinding.executePendingBindings();
     }
 
     private String getMessageText()
@@ -322,7 +313,7 @@ public class PiratePlaceFragment extends Fragment
 
     private void updatePiratePlace()
     {
-        PirateBase.getPirateBase(getActivity()).updatePiratePlace(mPiratePlace);
+        mBinding.getViewModel().updatePiratePlace();
         mCallbacks.onPiratePlaceUpdated(mPiratePlace);
     }
 
@@ -331,10 +322,10 @@ public class PiratePlaceFragment extends Fragment
         private ImageView mImageView;
         private Bitmap mImageBitmap;
 
-        public ImageHolder(LayoutInflater inflater, ViewGroup parent)
+        public ImageHolder(FragmentPiratePlaceImageBinding binding)
         {
-            super(inflater.inflate(R.layout.fragment_pirate_place_image, parent, false));
-            mImageView = (ImageView) itemView.findViewById(R.id.item_image_view);
+            super(binding.getRoot());
+            mImageView = binding.itemImageView;
         }
 
         public void bind(Bitmap bitmap)
@@ -362,7 +353,10 @@ public class PiratePlaceFragment extends Fragment
         public ImageHolder onCreateViewHolder(ViewGroup parent, int viewType)
         {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            return new ImageHolder(layoutInflater, parent);
+            FragmentPiratePlaceImageBinding binding = DataBindingUtil.inflate(layoutInflater,R.layout.fragment_pirate_place_image,
+                    parent,false);
+
+            return new ImageHolder(binding);
         }
 
         @Override
