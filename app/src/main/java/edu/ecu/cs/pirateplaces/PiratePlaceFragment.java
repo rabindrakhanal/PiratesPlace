@@ -232,7 +232,7 @@ public class PiratePlaceFragment extends Fragment
     public void onPause()
     {
         super.onPause();
-        PirateBase.getPirateBase(getActivity()).updatePiratePlace(mPiratePlace);
+        mBinding.getViewModel().updatePiratePlace();
     }
 
     @Override

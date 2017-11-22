@@ -21,8 +21,8 @@
 
     <ImageView
         android:id="@+id/pirate_place_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
         android:layout_marginTop="16dp"
@@ -31,7 +31,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:srcCompat="@android:drawable/btn_star"
-        android:contentDescription="@string/place_image"/>
+        android:contentDescription="@string/place_image"
+        app:imageUrl="@{ViewModel.imageUrl}"/>
 
     <TextView
         android:id="@+id/pirate_place_name"

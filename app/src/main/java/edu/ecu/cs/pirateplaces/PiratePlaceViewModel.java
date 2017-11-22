@@ -4,10 +4,16 @@ package edu.ecu.cs.pirateplaces;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.databinding.BindingAdapter;
+import android.widget.ImageView;
 
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -56,6 +62,21 @@ public class PiratePlaceViewModel extends BaseObservable{
 
     public void updatePiratePlace(){
         mPirateBase.updatePiratePlace(mPiratePlace);
+    }
+
+    public File getImageUrl(){
+        List<File> files = mPirateBase.getPhotoFiles(mPiratePlace);
+        if(files.size() != 0) {
+            File image = files.get(0);
+            return image;
+        }
+        return null;
+    }
+
+    @BindingAdapter("bind:imageUrl")
+    public static void loadImage(ImageView view, File file){
+        if(file != null)
+            Picasso.with(view.getContext()).load(file).fit().centerCrop().into(view);
     }
 }
 
